@@ -59,5 +59,23 @@ Theme, Module, Page, Resource, Role, RolePagePermission, RoleResourcePermission,
 - Frontend on port 4200 (hot-reload)
 - Named volumes for node_modules (Windows performance)
 
+## Quick Start (deploy & run)
+When asked to "deploy", "start", or "run" the project, follow these steps:
+1. Ensure `.env` exists: `cp .env.example .env` (skip if already exists)
+2. Ensure Docker Desktop is running (on Windows the user must start it manually)
+3. Run: `docker-compose up -d`
+4. Wait for containers to be healthy: `docker ps` (db, backend, frontend should be "Up")
+5. Backend auto-runs migrations and seed on startup. If seed fails (already seeded), that's OK.
+6. Verify backend is ready: `docker logs framework-backend --tail 5` (should show "Found 0 errors")
+7. Verify frontend is ready: `docker logs framework-frontend --tail 5` (should show "Application bundle generation complete")
+8. App is ready at http://localhost:4200
+
+If containers already exist and just need restarting: `docker-compose restart`
+If something is broken: `docker-compose down && docker-compose up -d --build`
+
 ## Default Credentials
-- Admin: admin@framework.com / Admin123!
+| Email | Password | Role |
+|---|---|---|
+| admin@framework.com | Admin123! | Administrador (system - full access) |
+| supervisor@framework.com | Admin123! | Supervisor (users, roles, dashboard) |
+| operator@framework.com | Admin123! | Operador (dashboard only) |

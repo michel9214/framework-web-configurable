@@ -39,9 +39,11 @@ The app is now running:
 
 ## Default Credentials
 
-| Email               | Password  | Role  |
-| ------------------- | --------- | ----- |
-| admin@framework.com | Admin123! | Admin |
+| Email                      | Password  | Role           |
+| -------------------------- | --------- | -------------- |
+| admin@framework.com        | Admin123! | Administrador  |
+| supervisor@framework.com   | Admin123! | Supervisor     |
+| operator@framework.com     | Admin123! | Operador       |
 
 ## Available Commands
 
