@@ -60,18 +60,69 @@ Theme, Module, Page, Resource, Role, RolePagePermission, RoleResourcePermission,
 - Named volumes for node_modules (Windows performance)
 
 ## Quick Start (deploy & run)
-When asked to "deploy", "start", or "run" the project, follow these steps:
-1. Ensure `.env` exists: `cp .env.example .env` (skip if already exists)
-2. Ensure Docker Desktop is running (on Windows the user must start it manually)
-3. Run: `docker-compose up -d`
-4. Wait for containers to be healthy: `docker ps` (db, backend, frontend should be "Up")
-5. Backend auto-runs migrations and seed on startup. If seed fails (already seeded), that's OK.
-6. Verify backend is ready: `docker logs framework-backend --tail 5` (should show "Found 0 errors")
-7. Verify frontend is ready: `docker logs framework-frontend --tail 5` (should show "Application bundle generation complete")
-8. App is ready at http://localhost:4200
+When asked to "deploy", "start", "run", or "levantar servicios", follow ALL these steps in order:
 
-If containers already exist and just need restarting: `docker-compose restart`
-If something is broken: `docker-compose down && docker-compose up -d --build`
+### Step 0: Check prerequisites
+1. Check if Docker is installed: `docker --version`
+   - If NOT installed:
+     - **Windows**: Download and install Docker Desktop silently:
+       ```bash
+       winget install -e --id Docker.DockerDesktop --accept-package-agreements --accept-source-agreements
+       ```
+       After install, tell the user to restart their PC or at minimum log out and back in (required for Docker group permissions).
+     - **macOS**: `brew install --cask docker`
+     - **Linux**: `curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker $USER`
+   - If installed, continue.
+
+2. Check if Docker daemon is running: `docker info > /dev/null 2>&1`
+   - If NOT running:
+     - **Windows**: Start Docker Desktop:
+       ```bash
+       cmd.exe /c "start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe""
+       ```
+       Then wait up to 60 seconds checking `docker info` every 5 seconds until it responds.
+     - **macOS**: `open -a Docker` and wait similarly.
+     - **Linux**: `sudo systemctl start docker`
+   - If running, continue.
+
+3. Check if docker-compose is available: `docker-compose --version || docker compose version`
+   - Docker Desktop includes docker-compose. If missing on Linux: `sudo apt install docker-compose-plugin`
+
+### Step 1: Configure environment
+```bash
+cp .env.example .env   # Skip if .env already exists
+```
+
+### Step 2: Start all services
+```bash
+docker-compose up -d
+```
+
+### Step 3: Wait and verify
+1. Wait for DB to be healthy: `docker ps` — db should show "(healthy)"
+2. Wait for backend to compile (up to 90 seconds):
+   ```bash
+   docker logs framework-backend --tail 5
+   ```
+   Expected: "Found 0 errors. Watching for file changes."
+   Backend auto-runs migrations and seed on startup. Seed errors on re-run are OK (data already exists).
+3. Wait for frontend to compile (up to 120 seconds):
+   ```bash
+   docker logs framework-frontend --tail 5
+   ```
+   Expected: "Application bundle generation complete"
+
+### Step 4: Report to user
+Tell the user:
+- App is ready at **http://localhost:4200**
+- Backend API at **http://localhost:3000/api**
+- Login credentials (see Default Credentials below)
+
+### Troubleshooting
+- Containers exist but stopped: `docker-compose restart`
+- Something is broken: `docker-compose down && docker-compose up -d --build`
+- Port conflict: Check `netstat -ano | findstr :4200` (Windows) or `lsof -i :4200` (Unix) and kill the process
+- Backend fails to start: Check `docker logs framework-backend` for errors
 
 ## Default Credentials
 | Email | Password | Role |
