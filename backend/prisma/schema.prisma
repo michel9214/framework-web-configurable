@@ -1,0 +1,219 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Theme {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  displayName String
+  cssClass    String
+  primary     String
+  secondary   String
+  accent      String
+  background  String
+  surface     String
+  text        String
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users User[]
+
+  @@map("themes")
+}
+
+model Module {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  displayName String
+  description String?
+  icon        String   @default("folder")
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pages Page[]
+
+  @@map("modules")
+}
+
+model Page {
+  id            Int      @id @default(autoincrement())
+  moduleId      Int
+  parentPageId  Int?
+  name          String   @unique
+  displayName   String
+  route         String
+  icon          String   @default("description")
+  order         Int      @default(0)
+  visibleInMenu Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  module     Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  parentPage Page?  @relation("PageChildren", fields: [parentPageId], references: [id])
+  childPages Page[] @relation("PageChildren")
+
+  resources           Resource[]
+  rolePagePermissions RolePagePermission[]
+
+  @@map("pages")
+}
+
+model Resource {
+  id          Int          @id @default(autoincrement())
+  pageId      Int
+  name        String
+  displayName String
+  code        String
+  type        ResourceType @default(BUTTON)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  roleResourcePermissions RoleResourcePermission[]
+
+  @@unique([pageId, code])
+  @@map("resources")
+}
+
+enum ResourceType {
+  BUTTON
+  ACTION
+  SECTION
+  FIELD
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  displayName String
+  description String?
+  isSystem    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users                   User[]
+  rolePagePermissions     RolePagePermission[]
+  roleResourcePermissions RoleResourcePermission[]
+
+  @@map("roles")
+}
+
+model RolePagePermission {
+  id        Int     @id @default(autoincrement())
+  roleId    Int
+  pageId    Int
+  canAccess Boolean @default(true)
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, pageId])
+  @@map("role_page_permissions")
+}
+
+model RoleResourcePermission {
+  id         Int     @id @default(autoincrement())
+  roleId     Int
+  resourceId Int
+  isAllowed  Boolean @default(true)
+
+  role     Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  resource Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, resourceId])
+  @@map("role_resource_permissions")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  roleId    Int
+  themeId   Int?
+  isActive  Boolean   @default(true)
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  role          Role          @relation(fields: [roleId], references: [id])
+  theme         Theme?        @relation(fields: [themeId], references: [id])
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Pedido {
+  id             Int            @id @default(autoincrement())
+  numero         String         @unique
+  cliente        String
+  observaciones  String?
+  total          Float          @default(0)
+  estado         String         @default("pendiente")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  items PedidoItem[]
+
+  @@map("pedidos")
+}
+
+model PedidoItem {
+  id             Int    @id @default(autoincrement())
+  pedidoId       Int
+  descripcion    String
+  cantidad       Int
+  precioUnitario Float
+  subtotal       Float
+
+  pedido Pedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  @@map("pedido_items")
+}
+
+model Empleado {
+  id             Int       @id @default(autoincrement())
+  codigo         String    @unique
+  dni            String    @unique
+  nombres        String
+  apellidos      String
+  cargo          String
+  departamento   String
+  telefono       String?
+  email          String?
+  fechaIngreso   DateTime
+  salario        Float     @default(0)
+  estado         String    @default("activo")
+  observaciones  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("empleados")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}

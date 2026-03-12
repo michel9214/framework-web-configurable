@@ -1,0 +1,101 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$frontend-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$blue-palette,
+  ),
+  density: (
+    scale: 0,
+  )
+));
+
+:root {
+  @include mat.all-component-themes($frontend-theme);
+
+  --theme-primary: #3f51b5;
+  --theme-secondary: #ff4081;
+  --theme-accent: #ff9800;
+  --theme-background: #fafafa;
+  --theme-surface: #ffffff;
+  --theme-text: #212121;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: var(--theme-background);
+  color: var(--theme-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+// Theme classes
+body.theme-dark {
+  --theme-primary: #00bcd4;
+  --theme-secondary: #ff4081;
+  --theme-accent: #ffab40;
+  --theme-background: #121212;
+  --theme-surface: #1e1e1e;
+  --theme-text: #e0e0e0;
+}
+
+body.theme-blue-corporate {
+  --theme-primary: #1565c0;
+  --theme-secondary: #42a5f5;
+  --theme-accent: #ffc107;
+  --theme-background: #eceff1;
+  --theme-surface: #ffffff;
+  --theme-text: #263238;
+}
+
+body.theme-green-nature {
+  --theme-primary: #2e7d32;
+  --theme-secondary: #66bb6a;
+  --theme-accent: #ff8f00;
+  --theme-background: #f1f8e9;
+  --theme-surface: #ffffff;
+  --theme-text: #1b5e20;
+}
+
+// Snackbar styles
+.snack-success {
+  --mdc-snackbar-container-color: #4caf50;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+.snack-error {
+  --mdc-snackbar-container-color: #f44336;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+.snack-warning {
+  --mdc-snackbar-container-color: #ff9800;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+.snack-info {
+  --mdc-snackbar-container-color: #2196f3;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
